@@ -9,7 +9,7 @@ def lambda_handler(event, context):
         valid_clients = ['apex']
         s3_client = boto3.client('s3')
         sqs_client = client = boto3.client('sqs')
-        bucket_name = os.environ['darwill-client-api-app-staging']
+        bucket_name = os.environ['S3_PAYLOAD_BUCKET']
 
         # Validate the client name
         client_name = event['path'].split("/")[2]
