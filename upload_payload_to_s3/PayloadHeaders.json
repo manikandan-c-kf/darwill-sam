@@ -1,0 +1,35 @@
+{
+    "apex_customer_fields": {
+        "required": [
+            "blueshift_message_uuid",
+            "tenant_id",
+            "tenant_location_id",
+            "customer_id",
+            "dart_id",
+            "schema_id",
+            "campaign_class"
+        ],
+        "optional": [
+            "firstname",
+            "lastname",
+            "address_line1",
+            "address_line2",
+            "address_city",
+            "address_postal_code",
+            "address_state",
+            "address_country",
+            "custom_attribute_01",
+            "custom_attribute_02",
+            "custom_attribute_03",
+            "custom_attribute_04",
+            "custom_attribute_05",
+            "custom_attribute_06",
+            "custom_attribute_07",
+            "custom_attribute_08",
+            "custom_attribute_09",
+            "custom_attribute_10",
+            "custom_attribute_11",
+            "custom_attribute_12"
+        ]
+    }
+}

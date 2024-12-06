@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Template to deploy Darwill API Client App
+
+# Template to validate API payload and upload the data to S3 and SQS
+
+Globals:
+  Function:
+    Timeout: 15
+    LoggingConfig:
+      LogFormat: JSON
+Parameters:
+  Environment:
+    Type: String
+    Description: Env name used to specify
+    AllowedValues:
+      - staging
+      - prod
+Resources:
+  PushAPIPayloadToS3Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: External Customer API
+      Description: REST API to handle payloads from external customers
+      StageName: !Ref Environment
+      ApiKeySourceType: HEADER
+      Auth:
+        ApiKeyRequired: true
+  PushAPIPayloadToS3Function:
+    Type: AWS::Serverless::Function
+    Description: APEX - Function which validates API and uploads payload to SQS and S3
+    Properties:
+      CodeUri: upload_payload_to_s3/
+      Handler: app.lambda_handler
+      Runtime: python3.13
+      Environment:
+        Variables:
+          LOW_COUNT_QUEUE: !Ref PushAPISQSLow
+          HIGH_COUNT_QUEUE: !Ref PushAPISQSHigh
+          S3_PAYLOAD_BUCKET: !Ref PushAPIS3Bucket
+      AutoPublishAlias: !Ref Environment
+      AutoPublishAliasAllProperties: true
+      Architectures:
+      - x86_64
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Ref PushAPIS3Bucket
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt PushAPISQSLow.QueueName
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt PushAPISQSHigh.QueueName
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /api/apex/storedata
+            Method: post
+            RestApiId:
+              Ref: PushAPIPayloadToS3Api
+            Auth:
+              ApiKeyRequired: true
+  PushAPIS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub darwill-client-api-app-${Environment}
+  PushAPISQSLow:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub darwill-${Environment}-external-payload-queue-low-count.fifo
+      ContentBasedDeduplication: True
+      ReceiveMessageWaitTimeSeconds: 20
+      FifoQueue: True
+      VisibilityTimeout: 1800
+      RedrivePolicy:
+        deadLetterTargetArn:
+          Fn::GetAtt:
+            - "PushAPISQSDeadLetter"
+            - "Arn"
+        maxReceiveCount: 1
+  PushAPISQSHigh:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub darwill-${Environment}-external-payload-queue-high-count.fifo
+      ContentBasedDeduplication: True
+      ReceiveMessageWaitTimeSeconds: 20
+      FifoQueue: True
+      VisibilityTimeout: 1800
+      RedrivePolicy:
+        deadLetterTargetArn:
+          Fn::GetAtt:
+            - "PushAPISQSDeadLetter"
+            - "Arn"
+        maxReceiveCount: 1
+  PushAPISQSDeadLetter:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub darwill-${Environment}-external-payload-queue-dead-letter
