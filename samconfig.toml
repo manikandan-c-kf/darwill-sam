@@ -34,3 +34,4 @@ capabilities = "CAPABILITY_IAM"
 Environment = "staging"
 image_repositories = []
 parameter_overrides = "Environment=\"staging\""
+no_confirm_changeset = true
