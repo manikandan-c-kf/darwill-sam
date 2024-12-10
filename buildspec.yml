@@ -6,4 +6,4 @@ phases:
   build:
     commands:
       - sam build
-      - sam deploy --debug --parameter-overrides Environment=staging
+      - sam deploy --debug --capabilities CAPABILITY_IAM --parameter-overrides Environment=staging
