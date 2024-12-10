@@ -32,7 +32,7 @@ Resources:
     Properties:
       CodeUri: upload_payload_to_s3/
       Handler: app.lambda_handler
-      Runtime: python3.13
+      Runtime: python3.10
       Environment:
         Variables:
           LOW_COUNT_QUEUE: !Ref PushAPISQSLow
