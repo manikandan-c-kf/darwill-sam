@@ -3,7 +3,13 @@ phases:
   install:
     runtime-versions:
       python: 3.10
+
   build:
     commands:
       - sam build
+      - sam validate
+      - sam deploy --no-execute-changeset
+
+  post_build:
+    commands:
       - sam deploy --debug --capabilities CAPABILITY_IAM --parameter-overrides Environment=staging
