@@ -62,7 +62,7 @@ Resources:
   PushAPIS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub darwill-client-api-app-${Environment}
+      BucketName: !Sub darwill-client-api-app-${AWS::AccountId}-${Environment}
   PushAPISQSLow:
     Type: AWS::SQS::Queue
     Properties:
@@ -94,4 +94,6 @@ Resources:
   PushAPISQSDeadLetter:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Sub darwill-${Environment}-external-payload-queue-dead-letter
+      QueueName: !Sub darwill-${Environment}-external-payload-queue-dead-letter.fifo
+      FifoQueue: True
+      ContentBasedDeduplication: True
