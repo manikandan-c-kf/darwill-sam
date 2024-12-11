@@ -2,4 +2,4 @@ version: 0.2
 phases:
   build:
     commands:
-      - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --capabilities CAPABILITY_IAM --parameter-overrides Environment=staging
+      - sam deploy --template-file /codebuild/output/src4129386894/src/template.yaml --stack-name darwill-stack --no-confirm-changeset --no-fail-on-empty-changeset --capabilities CAPABILITY_IAM --parameter-overrides Environment=staging
