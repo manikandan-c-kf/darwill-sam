@@ -63,10 +63,6 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub darwill-client-api-app-${AWS::AccountId}-${Environment}-101200
-  TestS3Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub darwill-client-api-app-${AWS::AccountId}-${Environment}-test
   PushAPISQSLow:
     Type: AWS::SQS::Queue
     Properties:

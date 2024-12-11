@@ -46,7 +46,7 @@ phases:
       - |
         CHANGESET_OUTPUT=$(aws cloudformation describe-change-set \
           --stack-name DarwillStackChangeSet \
-          --change-set-name DarwillStackChangeSet-changeset \
+          --change-set-name DarwillStack-changeset \
           --region $AWS_REGION)
         FORMATTED_CHANGESET=$(echo "$CHANGESET_OUTPUT" | jq '.Changes[]? | {Action: .ResourceChange.Action, Resource: .ResourceChange.LogicalResourceId, Type: .ResourceChange.ResourceType, Details: .ResourceChange.Details}')
         if [[ -z "$FORMATTED_CHANGESET" ]]; then
