@@ -42,7 +42,8 @@ phases:
     commands:
       - echo "Deploying with SAM to generate changeset..."
       - sam deploy --stack-name DarwillStackChangeSet --resolve-s3 --no-execute-changeset --region $AWS_REGION
-      - echo aws cloudformation list-change-sets --stack-name DarwillStackChangeSet
+      - echo "Change set list" 
+      - aws cloudformation list-change-sets --stack-name DarwillStackChangeSet
       - echo "Fetching changeset details..."
       - |
         CHANGESET_OUTPUT=$(aws cloudformation describe-change-set \
