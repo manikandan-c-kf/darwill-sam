@@ -14,27 +14,27 @@ phases:
       - sam build --template template.yaml
   # post_build:
   #   commands:
-  #     - echo "Build completed, sending message to Teams..."
   #     - |
+  #       echo "Constructing manual approval link..."
+  #       APPROVAL_LINK="https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/darwill-pipeline/view?region=$AWS_REGION#stage=Deploy&action=manual-approval"
+  #       echo "Sending message to Teams with approval link: $APPROVAL_LINK"
   #       curl -X POST -H "Content-Type: application/json" \
-  #       -d '{"text": "SAM Build is completed, please review the changeset and move further"}' \
-  #       "https://prod-22.centralindia.logic.azure.com:443/workflows/1eba6ea50afe4ec2aab09cbde3f9c45d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6VfNuGE9HT9n6XfsG-ya0OgxSwgpBzuEV2clNL7blTA" || echo "Failed to send message to Teams"
-  # post_build:
-  #   commands:
-  #     - echo "Build completed, sending message to Teams..."
-  #     - |
-  #       curl -X POST -H "Content-Type: application/json" \
-  #       -d '{"text": "SAM Build is completed. Please review the changeset and move further. \n\nYou can approve or reject the changes at the following link: [Approval Link](https://us-east-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/darwill-pipeline/view?region=us-east-1#stage=Deploy&action=manual-approval)"}' \
-  #       "https://prod-22.centralindia.logic.azure.com:443/workflows/1eba6ea50afe4ec2aab09cbde3f9c45d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6VfNuGE9HT9n6XfsG-ya0OgxSwgpBzuEV2clNL7blTA" || echo "Failed to send message to Teams"
+  #       -d '{
+  #             "text": "SAM Build is completed. Please review the changeset and move further.\n\nYou can approve or reject the changes at the following link: [Approval Link]('"$APPROVAL_LINK"')"
+  #           }' \
+  #       "https://prod-22.centralindia.logic.azure.com:443/workflows/1eba6ea50afe4ec2aab09cbde3f9c45d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6VfNuGE9HT9n6XfsG-ya0OgxSwgpBzuEV2clNL7blTA"
   post_build:
     commands:
       - |
-        echo "Constructing manual approval link..."
-        APPROVAL_LINK="https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/darwill-pipeline/view?region=$AWS_REGION#stage=Deploy&action=manual-approval"
-        echo "Sending message to Teams with approval link: $APPROVAL_LINK"
+        echo "Deploying with SAM to generate changeset..."
+        sam deploy --stack-name DarwillStack --s3-bucket darwill-changeset-bucket --no-execute-changeset --region $AWS_REGION
+        echo "Fetching changeset details..."
+        CHANGESET_OUTPUT=$(aws cloudformation describe-change-set --stack-name DarwillStack --change-set-name DarwillStack-changeset --region $AWS_REGION)
+        FORMATTED_CHANGESET=$(echo "$CHANGESET_OUTPUT" | jq '.Changes[] | {Action: .ResourceChange.Action, Resource: .ResourceChange.LogicalResourceId, Type: .ResourceChange.ResourceType, Details: .ResourceChange.Details}')
+        echo "Sending changeset to Teams..."
         curl -X POST -H "Content-Type: application/json" \
         -d '{
-              "text": "SAM Build is completed. Please review the changeset and move further.\n\nYou can approve or reject the changes at the following link: [Approval Link]('"$APPROVAL_LINK"')"
+              "text": "SAM Build is completed. Please review the changeset and move further.\n\nChangeset:\n'"$FORMATTED_CHANGESET"'\n\nYou can approve or reject the changes at the following link: [Approval Link](https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/darwill-pipeline/view?region=$AWS_REGION#stage=Deploy&action=manual-approval)"
             }' \
         "https://prod-22.centralindia.logic.azure.com:443/workflows/1eba6ea50afe4ec2aab09cbde3f9c45d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6VfNuGE9HT9n6XfsG-ya0OgxSwgpBzuEV2clNL7blTA"
 
