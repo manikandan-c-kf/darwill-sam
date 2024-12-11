@@ -8,8 +8,8 @@ phases:
     commands:
       - sam build
       - sam validate
-      - sam deploy --no-execute-changeset --no-confirm-changeset --no-fail-on-empty-changeset
+      - sam package --output-template-file template.yaml --no-confirm-changeset --no-fail-on-empty-changeset
 
-  post_build:
-    commands:
-      - sam deploy  --no-confirm-changeset --no-fail-on-empty-changeset --capabilities CAPABILITY_IAM --parameter-overrides Environment=staging
+artifacts:
+  files:
+    - template.yaml
