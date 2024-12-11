@@ -1,11 +1,19 @@
 version: 0.2
+
 phases:
   install:
     runtime-versions:
-      python: 3.10
-
+      python: 3.9
+    commands:
+      - echo Installing SAM CLI
+      - pip install aws-sam-cli
   build:
     commands:
-      - sam build
+      - echo Starting SAM Build
       - sam validate
-      - sam package --output-template-file template.yaml 
+      - sam build --template template.yaml
+artifacts:
+  files:
+    - .aws-sam/**/*
+    - template.yaml
+  base-directory: .aws-sam/build

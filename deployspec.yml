@@ -1,5 +1,19 @@
 version: 0.2
+
 phases:
+  install:
+    runtime-versions:
+      python: 3.9
+    commands:
+      - echo Installing SAM CLI
+      - pip install aws-sam-cli
+  pre_build:
+    commands:
+      - echo Logging in to AWS
+      - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+      - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+      - aws configure set region $AWS_REGION
   build:
     commands:
-      - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --capabilities CAPABILITY_IAM --parameter-overrides Environment=staging
+      - echo Starting SAM Deploy
+      - sam deploy --template-file template.yaml --stack-name DarwillStack --capabilities CAPABILITY_IAM
