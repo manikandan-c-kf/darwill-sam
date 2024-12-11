@@ -9,7 +9,3 @@ phases:
       - sam build
       - sam validate
       - sam package --output-template-file template.yaml 
-
-  post_build:
-    commands:
-      - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --capabilities CAPABILITY_IAM --parameter-overrides Environment=staging
