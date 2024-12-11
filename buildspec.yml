@@ -17,5 +17,4 @@ artifacts:
     - .aws-sam/**/*
     - template.yaml
     - deployspec.yml
-  base-directory: .aws-sam/build
-  
+  base-directory: .
