@@ -12,24 +12,25 @@ phases:
       - echo Starting SAM Build
       - sam validate
       - sam build --template template.yaml
-  # post_build:
-  #   commands:
-  #     - |
-  #       echo "Constructing manual approval link..."
-  #       APPROVAL_LINK="https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/darwill-pipeline/view?region=$AWS_REGION#stage=Deploy&action=manual-approval"
-  #       echo "Sending message to Teams with approval link: $APPROVAL_LINK"
-  #       curl -X POST -H "Content-Type: application/json" \
-  #       -d '{
-  #             "text": "SAM Build is completed. Please review the changeset and move further.\n\nYou can approve or reject the changes at the following link: [Approval Link]('"$APPROVAL_LINK"')"
-  #           }' \
-  #       "https://prod-22.centralindia.logic.azure.com:443/workflows/1eba6ea50afe4ec2aab09cbde3f9c45d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6VfNuGE9HT9n6XfsG-ya0OgxSwgpBzuEV2clNL7blTA"
+  post_build:
+    commands:
+      - |
+        echo "Constructing manual approval link..."
+        APPROVAL_LINK="https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/darwill-pipeline/view?region=$AWS_REGION#stage=Deploy&action=manual-approval"
+        echo "Sending message to Teams with approval link: $APPROVAL_LINK"
+        curl -X POST -H "Content-Type: application/json" \
+        -d '{
+              "text": "SAM Build is completed. Please review the changeset and move further.\n\nYou can approve or reject the changes at the following link: [Approval Link]('"$APPROVAL_LINK"')"
+            }' \
+        "https://prod-22.centralindia.logic.azure.com:443/workflows/1eba6ea50afe4ec2aab09cbde3f9c45d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6VfNuGE9HT9n6XfsG-ya0OgxSwgpBzuEV2clNL7blTA"
+        
   # post_build:
   #   commands:
   #     - |
   #       echo "Deploying with SAM to generate changeset..."
   #       sam deploy --stack-name DarwillStack --s3-bucket darwill-changeset-bucket --no-execute-changeset --region $AWS_REGION
   #       echo "Fetching changeset details..."
-  #       CHANGESET_OUTPUT=$(aws cloudformation describe-change-set --stack-name DarwillStack --change-set-name DarwillStackChangeSet --region $AWS_REGION)
+  #       CHANGESET_OUTPUT=$(aws cloudformation describe-change-set --stack-name DarwillStack --change-set-name DarwillStack-changeset --region $AWS_REGION)
   #       FORMATTED_CHANGESET=$(echo "$CHANGESET_OUTPUT" | jq '.Changes[] | {Action: .ResourceChange.Action, Resource: .ResourceChange.LogicalResourceId, Type: .ResourceChange.ResourceType, Details: .ResourceChange.Details}')
   #       echo "Sending changeset to Teams..."
   #       curl -X POST -H "Content-Type: application/json" \
@@ -38,28 +39,28 @@ phases:
   #           }' \
   #       "https://prod-22.centralindia.logic.azure.com:443/workflows/1eba6ea50afe4ec2aab09cbde3f9c45d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6VfNuGE9HT9n6XfsG-ya0OgxSwgpBzuEV2clNL7blTA"
 
-  post_build:
-    commands:
-      - echo "Deploying with SAM to generate changeset..."
-      - sam deploy --stack-name DarwillStackChangeSet --resolve-s3 --no-execute-changeset --region $AWS_REGION
-      - echo "Change set list" 
-      - aws cloudformation list-change-sets --stack-name DarwillStackChangeSet
-      - echo "Fetching changeset details..."
-      - |
-        CHANGESET_OUTPUT=$(aws cloudformation describe-change-set \
-          --stack-name DarwillStackChangeSet \
-          --change-set-name DarwillStackChangeSet \
-          --region $AWS_REGION)
-        FORMATTED_CHANGESET=$(echo "$CHANGESET_OUTPUT" | jq '.Changes[]? | {Action: .ResourceChange.Action, Resource: .ResourceChange.LogicalResourceId, Type: .ResourceChange.ResourceType, Details: .ResourceChange.Details}')
-        if [[ -z "$FORMATTED_CHANGESET" ]]; then
-          MESSAGE="SAM Build is completed. \n\n No changes detected. \n\n The stack is already up-to-date."
-        else
-          MESSAGE="SAM Build is completed. Please review the changeset and move further.\n\nChangeset:\n$FORMATTED_CHANGESET\n\nYou can approve or reject the changes at the following link: [Approval Link](https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/darwill-pipeline/view?region=$AWS_REGION#stage=Deploy&action=manual-approval)"
-        fi
-        echo "Sending changeset to Teams..."
-        curl -X POST -H "Content-Type: application/json" \
-          -d "{ \"text\": \"$MESSAGE\" }" \
-          "https://prod-22.centralindia.logic.azure.com:443/workflows/1eba6ea50afe4ec2aab09cbde3f9c45d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6VfNuGE9HT9n6XfsG-ya0OgxSwgpBzuEV2clNL7blTA"
+  # post_build:
+  #   commands:
+  #     - echo "Deploying with SAM to generate changeset..."
+  #     - sam deploy --stack-name DarwillStackChangeSet --resolve-s3 --no-execute-changeset --region $AWS_REGION
+  #     - echo "Change set list" 
+  #     - aws cloudformation list-change-sets --stack-name DarwillStackChangeSet
+  #     - echo "Fetching changeset details..."
+  #     - |
+  #       CHANGESET_OUTPUT=$(aws cloudformation describe-change-set \
+  #         --stack-name DarwillStackChangeSet \
+  #         --change-set-name DarwillStack-changeset \
+  #         --region $AWS_REGION)
+  #       FORMATTED_CHANGESET=$(echo "$CHANGESET_OUTPUT" | jq '.Changes[]? | {Action: .ResourceChange.Action, Resource: .ResourceChange.LogicalResourceId, Type: .ResourceChange.ResourceType, Details: .ResourceChange.Details}')
+  #       if [[ -z "$FORMATTED_CHANGESET" ]]; then
+  #         MESSAGE="SAM Build is completed. \n\n No changes detected. \n\n The stack is already up-to-date."
+  #       else
+  #         MESSAGE="SAM Build is completed. Please review the changeset and move further.\n\nChangeset:\n$FORMATTED_CHANGESET\n\nYou can approve or reject the changes at the following link: [Approval Link](https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/darwill-pipeline/view?region=$AWS_REGION#stage=Deploy&action=manual-approval)"
+  #       fi
+  #       echo "Sending changeset to Teams..."
+  #       curl -X POST -H "Content-Type: application/json" \
+  #         -d "{ \"text\": \"$MESSAGE\" }" \
+  #         "https://prod-22.centralindia.logic.azure.com:443/workflows/1eba6ea50afe4ec2aab09cbde3f9c45d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6VfNuGE9HT9n6XfsG-ya0OgxSwgpBzuEV2clNL7blTA"
 
 
 artifacts:
