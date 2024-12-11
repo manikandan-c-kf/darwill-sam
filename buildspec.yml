@@ -50,7 +50,7 @@ phases:
           --region $AWS_REGION)
         FORMATTED_CHANGESET=$(echo "$CHANGESET_OUTPUT" | jq '.Changes[]? | {Action: .ResourceChange.Action, Resource: .ResourceChange.LogicalResourceId, Type: .ResourceChange.ResourceType, Details: .ResourceChange.Details}')
         if [[ -z "$FORMATTED_CHANGESET" ]]; then
-          MESSAGE="SAM Build is completed. No changes detected. The stack is already up-to-date."
+          MESSAGE="SAM Build is completed. \n\n No changes detected. \n\n The stack is already up-to-date."
         else
           MESSAGE="SAM Build is completed. Please review the changeset and move further.\n\nChangeset:\n$FORMATTED_CHANGESET\n\nYou can approve or reject the changes at the following link: [Approval Link](https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/darwill-pipeline/view?region=$AWS_REGION#stage=Deploy&action=manual-approval)"
         fi
