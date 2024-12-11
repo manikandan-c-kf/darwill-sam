@@ -6,6 +6,7 @@ phases:
       python: 3.10
   build:
     commands:
+      - ls -l
       - echo Starting SAM Deploy
       - sam deploy --template-file template.yaml --stack-name DarwillStack --capabilities CAPABILITY_IAM
 artifacts:
