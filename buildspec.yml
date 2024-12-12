@@ -13,6 +13,7 @@ phases:
       - echo Starting SAM Build
       - sam validate # Validate the sam template
       - sam build --template template.yaml # build the sam template
+      - sam deploy --template-file template.yaml --stack-name DarwillStack --no-execute-changeset --no-fail-on-empty-changeset --capabilities CAPABILITY_IAM
   post_build:
     commands:
       - |

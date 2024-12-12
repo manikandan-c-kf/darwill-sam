@@ -6,7 +6,7 @@ from datetime import datetime
 
 def lambda_handler(event, context):
     try:
-        print("testing")
+        print("testing lambda function")
         valid_clients = ['apex']
         s3_client = boto3.client('s3')
         sqs_client = client = boto3.client('sqs')
