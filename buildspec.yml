@@ -58,6 +58,7 @@ phases:
   post_build:
     commands:
       - |
+        echo "Account Id = $(echo $CODEBUILD_BUILD_ARN | cut -f5 -d ':')"
         echo "Fetching Build Logs Link..."
         echo "Project Name: $CODEBUILD_PROJECT_NAME"
         echo "Build ID: $CODEBUILD_BUILD_ID"
