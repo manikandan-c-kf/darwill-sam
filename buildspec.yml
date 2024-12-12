@@ -7,6 +7,11 @@ phases:
     commands:
       - echo Installing SAM CLI
       - pip install aws-sam-cli
+      - echo Fetching AWS Account ID
+      - export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - echo Fetching CodeBuild Project Name
+      - export CODEBUILD_PROJECT_NAME=$(aws codebuild list-projects --query 'projects[?starts_with(@, `darwill`)] | [0]' --output text)
+
   build:
     commands:
       - echo Starting SAM Build
