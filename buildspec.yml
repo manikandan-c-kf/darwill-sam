@@ -18,7 +18,7 @@ phases:
     commands:
       - |
         # Constructing Build Logs URL
-        BUILD_LOGS_URL="https://$AWS_REGION.console.aws.amazon.com/codesuite/codebuild/$(echo $CODEBUILD_BUILD_ARN | cut -f5 -d ':')/projects/$(echo $CODEBUILD_BUILD_ID | cut -f1 -d ':')/build/$CODEBUILD_BUILD_ID/logs?region=$AWS_REGION"
+        BUILD_LOGS_URL="https://$AWS_REGION.console.aws.amazon.com/codesuite/codebuild/$(echo $CODEBUILD_BUILD_ARN | cut -f5 -d ':')/projects/$(echo $CODEBUILD_BUILD_ID | cut -f1 -d ':')/build/$CODEBUILD_BUILD_ID/log?region=$AWS_REGION"
 
         # Update the pipeline name, stage name if the stage and action is other than manual-approval
         echo "Fetching Manual Approval Link..."
