@@ -9,7 +9,7 @@ phases:
       - ls -l
       - echo Starting SAM Deploy
       # Update the Stack name [according to the project] [if necessary]
-      - sam deploy --template-file template.yaml --stack-name DarwillStack --capabilities CAPABILITY_IAM
+      - sam deploy --template-file template.yaml --stack-name DarwillStack --no-fail-on-empty-changeset --capabilities CAPABILITY_IAM
 artifacts:
   files:
     - '**/*'
