@@ -68,7 +68,6 @@ Resources:
     Properties:
       BucketName: !Sub darwill-client-api-app-${AWS::AccountId}-${Environment}-test
   PushAPISQSLow:
-  PushAPISQSLow:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: !Sub darwill-${Environment}-external-payload-queue-low-count.fifo
