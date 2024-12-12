@@ -11,60 +11,23 @@ phases:
   build:
     commands:
       - echo Starting SAM Build
-      - sam validate
-      - sam build --template template.yaml
-  # post_build:
-  #   commands:
-  #     - |
-  #       echo "Generating change set..."
-  #       sam deploy --template-file template.yaml --stack-name MySAMStack \
-  #         --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
-  #         --no-fail-on-empty-changeset \
-  #         --no-execute-changeset > changeset_output.txt
-  #       echo "Change set generated and saved to changeset_output.txt"
-  #     - |
-  #       echo "Print change set output file"
-  #       cat changeset_output.txt
-  #     - |
-  #       echo "Constructing manual approval link..."
-  #       APPROVAL_LINK="https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/darwill-pipeline/view?region=$AWS_REGION#stage=Deploy&action=manual-approval"
-  #       echo "Sending message to Teams with approval link: $APPROVAL_LINK"
-  #       curl -X POST -H "Content-Type: application/json" \
-  #       -d '{
-  #             "text": "SAM Build is completed. Please review the changeset saved in changeset_output.txt and move further.\n\nYou can approve or reject the changes at the following link: [Approval Link]('"$APPROVAL_LINK"')"
-  #           }' \
-  #       "https://prod-22.centralindia.logic.azure.com:443/workflows/1eba6ea50afe4ec2aab09cbde3f9c45d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6VfNuGE9HT9n6XfsG-ya0OgxSwgpBzuEV2clNL7blTA"
-
-  # post_build:
-  #   commands:
-  #     - |
-  #       echo "Constructing build logs link..."
-  #       BUILD_LOGS_URL="https://$AWS_REGION.console.aws.amazon.com/codesuite/codebuild/projects/$CODEBUILD_PROJECT_NAME/build/$CODEBUILD_BUILD_ID/logs?region=$AWS_REGION"
-
-  #       echo "Constructing manual approval link..."
-  #       APPROVAL_LINK="https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/$CODEPIPELINE_NAME/view?region=$AWS_REGION#stage=Deploy&action=manual-approval"
-
-  #       echo "Sending message to Teams with build logs and approval link..."
-  #       curl -X POST -H "Content-Type: application/json" \
-  #       -d '{
-  #             "text": "SAM Build is completed.\n\nYou can review the build logs here: [Build Logs]('"$BUILD_LOGS_URL"').\n\nPlease review the changeset and approve or reject the changes at this link: [Manual Approval Link]('"$APPROVAL_LINK"')."
-  #           }' \
-  #       "https://prod-22.centralindia.logic.azure.com:443/workflows/1eba6ea50afe4ec2aab09cbde3f9c45d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6VfNuGE9HT9n6XfsG-ya0OgxSwgpBzuEV2clNL7blTA"
-
+      - sam validate # Validate the sam template
+      - sam build --template template.yaml # build the sam template
   post_build:
     commands:
       - |
-        ACCOUNT_ID=$(echo $CODEBUILD_BUILD_ARN | cut -f5 -d ':')
         # Constructing Build Logs URL
         BUILD_LOGS_URL="https://$AWS_REGION.console.aws.amazon.com/codesuite/codebuild/$(echo $CODEBUILD_BUILD_ARN | cut -f5 -d ':')/projects/$(echo $CODEBUILD_BUILD_ID | cut -f1 -d ':')/build/$CODEBUILD_BUILD_ID/logs?region=$AWS_REGION"
 
+        # Update the pipeline name, stage name if the stage and action is other than manual-approval
         echo "Fetching Manual Approval Link..."
         APPROVAL_LINK="https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/darwill-test-pipeline/view?region=$AWS_REGION#stage=manual-approval&action=manual-approval"
 
+        # Update the teams URL
         echo "Sending message to Teams with build logs and approval link..."
         curl -X POST -H "Content-Type: application/json" \
         -d '{
-              "text": "Build completed!\n\nPlease check the change set before proceeding further: [Build Logs]('"$BUILD_LOGS_URL"')\n\nYou can Approve or reject changes using this link: [Manual Approval]('"$APPROVAL_LINK"')."
+              "text": "Build completed!\n\nPlease review the change set before proceeding further: [Build Logs]('"$BUILD_LOGS_URL"')\n\nYou can Approve or reject changes using this link: [Manual Approval]('"$APPROVAL_LINK"')."
             }' \
         "https://prod-22.centralindia.logic.azure.com:443/workflows/1eba6ea50afe4ec2aab09cbde3f9c45d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6VfNuGE9HT9n6XfsG-ya0OgxSwgpBzuEV2clNL7blTA"
 artifacts:
