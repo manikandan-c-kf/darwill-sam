@@ -59,7 +59,7 @@ phases:
         BUILD_LOGS_URL="https://$AWS_REGION.console.aws.amazon.com/codesuite/codebuild/$(echo $CODEBUILD_BUILD_ARN | cut -f5 -d ':')/projects/$(echo $CODEBUILD_BUILD_ID | cut -f1 -d ':')/build/$CODEBUILD_BUILD_ID/logs?region=$AWS_REGION"
 
         echo "Fetching Manual Approval Link..."
-        APPROVAL_LINK="https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/$CODEPIPELINE_NAME/view?region=$AWS_REGION#stage=Deploy&action=manual-approval"
+        APPROVAL_LINK="https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/$CODEPIPELINE_NAME/view?region=$AWS_REGION#stage=manual-approval&action=manual-approval"
 
         echo "Sending message to Teams with build logs and approval link..."
         curl -X POST -H "Content-Type: application/json" \
