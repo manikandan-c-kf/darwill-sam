@@ -63,10 +63,10 @@ phases:
         echo "Project Name: $CODEBUILD_PROJECT_NAME"
         echo "Build ID: $CODEBUILD_BUILD_ID"
         echo "Region: $AWS_REGION"
-        echo "Account ID: $AWS_ACCOUNT_ID"
+        echo "Account ID: $(echo $CODEBUILD_BUILD_ARN | cut -f5 -d ':')"
 
         # Constructing Build Logs URL
-        BUILD_LOGS_URL="https://$AWS_REGION.console.aws.amazon.com/codesuite/codebuild/$AWS_ACCOUNT_ID/projects/$CODEBUILD_PROJECT_NAME/build/$CODEBUILD_PROJECT_NAME:$CODEBUILD_BUILD_ID/logs?region=$AWS_REGION"
+        BUILD_LOGS_URL="https://$AWS_REGION.console.aws.amazon.com/codesuite/codebuild/$(echo $CODEBUILD_BUILD_ARN | cut -f5 -d ':')/projects/darwill-sam-build-project/build/darwill-sam-build-project:$CODEBUILD_BUILD_ID/logs?region=$AWS_REGION"
 
         echo "Fetching Manual Approval Link..."
         APPROVAL_LINK="https://$AWS_REGION.console.aws.amazon.com/codesuite/codepipeline/pipelines/$CODEPIPELINE_NAME/view?region=$AWS_REGION#stage=Deploy&action=manual-approval"
