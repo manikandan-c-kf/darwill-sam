@@ -58,13 +58,12 @@ phases:
   post_build:
     commands:
       - |
-        echo "Account Id = $(echo $CODEBUILD_BUILD_ARN | cut -f5 -d ':')"
+        ACCOUNT_ID=$(echo $CODEBUILD_BUILD_ARN | cut -f5 -d ':')
         echo "Fetching Build Logs Link..."
         echo "Project Name: $CODEBUILD_PROJECT_NAME"
         echo "Build ID: $CODEBUILD_BUILD_ID"
         echo "Region: $AWS_REGION"
-        echo "Account ID: $(echo $CODEBUILD_BUILD_ARN | cut -f5 -d ':')"
-
+        echo "ACCOUNT_ID: $ACCOUNT_ID"
         # Constructing Build Logs URL
         BUILD_LOGS_URL="https://$AWS_REGION.console.aws.amazon.com/codesuite/codebuild/$(echo $CODEBUILD_BUILD_ARN | cut -f5 -d ':')/projects/darwill-sam-build-project/build/darwill-sam-build-project:$CODEBUILD_BUILD_ID/logs?region=$AWS_REGION"
 
